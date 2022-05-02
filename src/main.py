@@ -24,7 +24,10 @@ while cap.isOpened():
     if not success:
         continue
 
-    img, landmarks = hand_tracker.find_hands(img)
+    img = hand_tracker.find_hands(img)
+
+    if len(hand_tracker.position) > 0:
+        pos = hand_tracker.position[0]
 
     # c_time = time.time()
     # fps = 1 / (c_time - p_time)
