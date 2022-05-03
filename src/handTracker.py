@@ -1,6 +1,14 @@
 import cv2
 import mediapipe as mp
 
+FINGERS = [
+    [1, 2, 3, 4],       # thumb
+    [5, 6, 7, 8],       # index
+    [9, 10, 11, 12],    # middle
+    [13, 14, 15, 16],   # ring
+    [17, 18, 19, 20]    # pinky
+]
+
 class HandTracker():
     def __init__(self, static_mode=False, max_hands=2, detection_con=0.5, tracking_con=0.5):
         self.mp_hands = mp.solutions.hands
@@ -33,5 +41,23 @@ class HandTracker():
 
         return image
 
-    def convert_to_pixels(self, landmark):
-        pass
+    def detect_fingers(self, hand):
+        status = [0, 0, 0, 0, 0]
+
+        if len(hand) > 0:
+            base = hand[0]
+            idx = 0
+            for finger in FINGERS:
+                tip = finger[-1]
+                ip = finger[-2]
+                d_tip = pow(hand[tip][1] - base[1], 2) + pow(hand[tip][2] - base[2], 2)
+                d_ip = pow(hand[ip][1] - base[1], 2) + pow(hand[ip][2] - base[2], 2)
+                if d_tip > d_ip:
+                    status[idx] = 1
+                idx = idx + 1
+
+        return status
+
+if __name__ == "__main__":
+    print("This file cannot be used like a standalone Python file.")
+    print("If you want to use it, you need to import this file in another Python file.")

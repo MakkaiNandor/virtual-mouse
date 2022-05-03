@@ -11,39 +11,45 @@ FPS_FONT_THICKNESS = 3
 
 SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
 
-hand_tracker = HandTracker(max_hands=1)
+def main():
+    hand_tracker = HandTracker(max_hands=1)
 
-cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(0)
 
-p_time = 0
-c_time = 0
+    # p_time = 0
+    # c_time = 0
 
-while cap.isOpened():
-    success, img = cap.read()
+    while cap.isOpened():
+        success, img = cap.read()
 
-    if not success:
-        continue
+        if not success:
+            continue
 
-    img = hand_tracker.find_hands(img)
+        img = hand_tracker.find_hands(img)
 
-    if len(hand_tracker.position) > 0:
-        pos = hand_tracker.position[0]
+        if len(hand_tracker.position) > 0:
+            hand_pos = hand_tracker.position[0]
+            res = hand_tracker.detect_fingers(hand_pos)
+            print(res)
 
-    # c_time = time.time()
-    # fps = 1 / (c_time - p_time)
-    # p_time = c_time
+        # c_time = time.time()
+        # fps = 1 / (c_time - p_time)
+        # p_time = c_time
 
-    # text = str(int(fps))
-    # text = str(SCREEN_WIDTH) + ":" + str(SCREEN_HEIGHT)
+        # text = str(int(fps))
+        # text = str(SCREEN_WIDTH) + ":" + str(SCREEN_HEIGHT)
 
-    img = cv2.flip(img, 1)
+        img = cv2.flip(img, 1)
 
-    # cv2.putText(img, text, FPS_POSITION, FPS_FONT, FPS_FONT_SCALE, FPS_COLOR, FPS_FONT_THICKNESS)
+        # cv2.putText(img, text, FPS_POSITION, FPS_FONT, FPS_FONT_SCALE, FPS_COLOR, FPS_FONT_THICKNESS)
 
-    cv2.imshow("Virtual Mouse", img)
+        cv2.imshow("Virtual Mouse", img)
 
-    if cv2.waitKey(1) == 27:
-        break
+        if cv2.waitKey(1) == 27:
+            break
 
-cap.release()
-cv2.destroyAllWindows()
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()
