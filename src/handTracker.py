@@ -1,5 +1,6 @@
 import cv2
 import mediapipe as mp
+import math
 
 FINGER_THUMB = [1, 2, 3, 4]
 FINGER_INDEX = [5, 6, 7, 8]
@@ -44,9 +45,8 @@ class HandTracker:
             The image.
         """
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        image.flags.writeable = False
+        image_rgb.flags.writeable = False
         results = self.hands.process(image_rgb)
-        image.flags.writeable = True
         self.position = []
         img_h, img_w, _ = image.shape
 
@@ -101,6 +101,17 @@ class HandTracker:
             The square distance between points.
         """
         return pow(p1['x'] - p2['x'], 2) + pow(p1['y'] - p2['y'], 2)
+
+    def distance(self, p1, p2):
+        """
+        Calculate the distance between two points.
+        Arguments:
+            p1: The first point
+            p2: The second point
+        Returns:
+            The distance between points.
+        """
+        return math.sqrt(self.square_distance(p1, p2))
 
 if __name__ == "__main__":
     print("This file cannot be used like a standalone Python file.")
