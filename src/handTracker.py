@@ -1,12 +1,18 @@
 import cv2
 import mediapipe as mp
 
+FINGER_THUMB = [1, 2, 3, 4]
+FINGER_INDEX = [5, 6, 7, 8]
+FINGER_MIDDLE = [9, 10, 11, 12]
+FINGER_RING = [13, 14, 15, 16]
+FINGER_PINKY = [17, 18, 19, 20]
+
 FINGERS = [
-    [1, 2, 3, 4],       # thumb
-    [5, 6, 7, 8],       # index
-    [9, 10, 11, 12],    # middle
-    [13, 14, 15, 16],   # ring
-    [17, 18, 19, 20]    # pinky
+    FINGER_THUMB,
+    FINGER_INDEX,
+    FINGER_MIDDLE,
+    FINGER_RING,
+    FINGER_PINKY
 ]
 
 class HandTracker:
@@ -38,7 +44,9 @@ class HandTracker:
             The image.
         """
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image.flags.writeable = False
         results = self.hands.process(image_rgb)
+        image.flags.writeable = True
         self.position = []
         img_h, img_w, _ = image.shape
 
@@ -68,23 +76,31 @@ class HandTracker:
         status = [0, 0, 0, 0, 0]
 
         if len(hand) > 0:
-            base = hand[0]
-            idx = 0
-            for finger in FINGERS:
+            for idx in range(5):
+                finger = FINGERS[idx]
                 if idx == 0:
-                    # if the THUMB finger
-                    pass
+                    base = hand[5]
+                    continue
                 else:
-                    # if not the THUMB finger
-                    tip = finger[-1]
-                    ip = finger[-2]
-                    d_tip = pow(hand[tip]['x'] - base['x'], 2) + pow(hand[tip]['y'] - base['y'], 2)
-                    d_ip = pow(hand[ip]['x'] - base['x'], 2) + pow(hand[ip]['y'] - base['y'], 2)
-                    if d_tip > d_ip:
-                        status[idx] = 1
-                idx = idx + 1
+                    base = hand[0]
+                d1 = self.square_distance(hand[finger[0]], base)
+                d2 = self.square_distance(hand[finger[2]], base)
+                d3 = self.square_distance(hand[finger[3]], base)
+                if d3 > d1 and d3 > d2:
+                    status[idx] = 1
 
         return status
+
+    def square_distance(self, p1, p2):
+        """
+        Calculate the square distance between two points.
+        Arguments:
+            p1: The first point
+            p2: The second point
+        Returns:
+            The square distance between points.
+        """
+        return pow(p1['x'] - p2['x'], 2) + pow(p1['y'] - p2['y'], 2)
 
 if __name__ == "__main__":
     print("This file cannot be used like a standalone Python file.")

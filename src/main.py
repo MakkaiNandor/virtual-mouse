@@ -1,7 +1,7 @@
 import cv2
 import time
 import pyautogui
-from handTracker import HandTracker
+from handtracker import HandTracker
 
 FPS_POSITION = (10, 70)
 FPS_FONT = cv2.FONT_HERSHEY_PLAIN
