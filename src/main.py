@@ -47,6 +47,7 @@ def main():
                 # cv2.circle(img, center2, 10, (0, 255, 0), -1)
                 # d = hand_tracker.distance(pointer1, pointer2)
                 # print(d)
+                pass
     
         c_time = time.time()
         fps = 1 / (c_time - p_time)
