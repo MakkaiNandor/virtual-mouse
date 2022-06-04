@@ -2,7 +2,7 @@ import cv2
 import time
 import threading
 from handtracker import HandTracker
-import mouse
+from mouse import Mouse
 
 TEXT_POSITION = (10, 50)
 TEXT_FONT = cv2.FONT_HERSHEY_PLAIN
@@ -10,8 +10,11 @@ TEXT_FONT_SCALE = 2
 TEXT_COLOR = (255, 0, 0)
 TEXT_FONT_THICKNESS = 2
 
+# actions = ["nothing", "mouse_move", "click"]
+
 def main():
     hand_tracker = HandTracker(max_hands=1)
+    mouse = Mouse()
 
     cap = cv2.VideoCapture(0)
 
@@ -22,6 +25,9 @@ def main():
     p_pos_y = None
     c_pos_x = None
     c_pos_y = None
+    velocity = 2
+    smooth = 5
+    move_mouse = False
     ACTION_NAME = "Nothing"
 
     while cap.isOpened():
@@ -39,41 +45,33 @@ def main():
 
             # mouse actions depending hand gestures
             if status == [0, 1, 0, 0, 0]:
-                # move the mouse
+                velocity = 2
+                move_mouse = True
                 ACTION_NAME = "Move Mouse"
-                pointer = hand_pos[8]
-                c_pos_x = pointer['x']
-                c_pos_y = pointer['y']
-                cv2.circle(img, (c_pos_x, c_pos_y), 10, (0, 255, 0), -1)
-                if not p_pos_x is None and not p_pos_y is None:
-                    offset_x = p_pos_x - c_pos_x
-                    offset_y = c_pos_y - p_pos_y
-                    t = threading.Thread(target=mouse.mouseMove, args=(offset_x, offset_y), daemon=True)
-                    t.start()
-                p_pos_x = c_pos_x
-                p_pos_y = c_pos_y
             elif status == [0, 1, 1, 0, 0]:
-                # move the mouse faster
+                velocity = 5
+                move_mouse = True
                 ACTION_NAME = "Move Mouse Faster"
-                pointer = hand_pos[8]
-                c_pos_x = pointer['x']
-                c_pos_y = pointer['y']
-                cv2.circle(img, (c_pos_x, c_pos_y), 10, (0, 255, 0), -1)
-                if not p_pos_x is None and not p_pos_y is None:
-                    offset_x = (p_pos_x - c_pos_x) * 5
-                    offset_y = (c_pos_y - p_pos_y) * 5
-                    t = threading.Thread(target=mouse.mouseMove, args=(offset_x, offset_y), daemon=True)
-                    t.start()
-                p_pos_x = c_pos_x
-                p_pos_y = c_pos_y
-                pass
             else:
-                ACTION_NAME = "Nothing"
+                move_mouse = False
+                ACTION_NAME = ""
                 p_pos_x = None
                 p_pos_y = None
                 c_pos_x = None
                 c_pos_y = None
-    
+
+            if move_mouse:
+                pointer = hand_pos[8]
+                c_pos_x = pointer['x']
+                c_pos_y = pointer['y']
+                cv2.circle(img, (c_pos_x, c_pos_y), 10, (0, 255, 0), -1)
+                if not p_pos_x is None and not p_pos_y is None:
+                    offset_x = (p_pos_x - c_pos_x) * velocity
+                    offset_y = - (p_pos_y - c_pos_y) * velocity
+                    threading.Thread(target=mouse.moveBy, args=(offset_x, offset_y), daemon=True).start()
+                p_pos_x = c_pos_x
+                p_pos_y = c_pos_y
+
         c_time = time.time()
         fps = 1 / (c_time - p_time)
         p_time = c_time

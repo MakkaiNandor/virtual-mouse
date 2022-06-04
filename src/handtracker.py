@@ -76,13 +76,9 @@ class HandTracker:
         status = [0, 0, 0, 0, 0]
 
         if len(hand) > 0:
-            for idx in range(5):
+            for idx in range(1, 5):
                 finger = FINGERS[idx]
-                if idx == 0:
-                    base = hand[5]
-                    continue
-                else:
-                    base = hand[0]
+                base = hand[0]
                 d1 = self.square_distance(hand[finger[0]], base)
                 d2 = self.square_distance(hand[finger[2]], base)
                 d3 = self.square_distance(hand[finger[3]], base)
