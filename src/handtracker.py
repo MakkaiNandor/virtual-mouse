@@ -1,14 +1,5 @@
 import cv2
 import mediapipe as mp
-import math
-
-FINGERS = [
-    [1, 2, 3, 4],
-    [5, 6, 7, 8],
-    [9, 10, 11, 12],
-    [13, 14, 15, 16],
-    [17, 18, 19, 20]
-]
 
 class HandTracker:
     def __init__(self, static_mode=False, max_hands=2, detection_con=0.5, tracking_con=0.5):
@@ -28,6 +19,7 @@ class HandTracker:
             min_tracking_confidence=tracking_con
         )
         self.mp_draw = mp.solutions.drawing_utils
+        self.__hands = []
 
     def find_hands(self, image, draw=True):
         """
@@ -35,13 +27,11 @@ class HandTracker:
         Arguments:
             image: The input BGR image
             draw: If True, draw the hand landmarks on the image. Default: True
-        Returns:
-            The image.
         """
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image_rgb.flags.writeable = False
         results = self.hands.process(image_rgb)
-        self.position = []
+        self.__hands = []
         img_h, img_w, _ = image.shape
 
         if results.multi_hand_landmarks:
@@ -49,59 +39,19 @@ class HandTracker:
                 if draw:
                     self.mp_draw.draw_landmarks(image, hand_lms, self.mp_hands.HAND_CONNECTIONS)
 
-                tmp = []
+                landmarks = {}
 
                 for nr, lm in enumerate(hand_lms.landmark):
+                    # convert landmarks to pixels
                     x, y = int(lm.x * img_w), int(lm.y * img_h)
-                    tmp.append({"id": nr, "x": x, "y": y})
+                    landmarks[nr] = {"x": x, "y": y}
 
-                self.position.append(tmp)
+                self.__hands.append(landmarks)
 
-        return image
-
-    def detect_fingers(self, hand):
-        """
-        Detect which fingers are up.
-        Arguments:
-            hand: Position of a single hand.
-        Returns:
-            An array of finger's status. (0 - down, 1 - up)
-        """
-        status = [0, 0, 0, 0, 0]
-
-        if len(hand) > 0:
-            for idx in range(1, 5):
-                finger = FINGERS[idx]
-                base = hand[0]
-                d1 = self.square_distance(hand[finger[0]], base)
-                d2 = self.square_distance(hand[finger[2]], base)
-                d3 = self.square_distance(hand[finger[3]], base)
-                if d3 > d1 and d3 > d2:
-                    status[idx] = 1
-
-        return status
-
-    def square_distance(self, p1, p2):
-        """
-        Calculate the square distance between two points.
-        Arguments:
-            p1: The first point
-            p2: The second point
-        Returns:
-            The square distance between points.
-        """
-        return pow(p1['x'] - p2['x'], 2) + pow(p1['y'] - p2['y'], 2)
-
-    def distance(self, p1, p2):
-        """
-        Calculate the distance between two points.
-        Arguments:
-            p1: The first point
-            p2: The second point
-        Returns:
-            The distance between points.
-        """
-        return math.sqrt(self.square_distance(p1, p2))
+    def get_landmarks(self, hand_index):
+        if 0 <= hand_index and hand_index < len(self.__hands):
+            return self.__hands[hand_index]
+        return {}
 
 if __name__ == "__main__":
     print("This file cannot be used like a standalone Python file.")
