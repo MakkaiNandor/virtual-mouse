@@ -1,20 +1,17 @@
 import cv2
 import time
 import threading
+import utils
 from handtracker import HandTracker
-from mouse import Mouse
-
-TEXT_POSITION = (10, 50)
-TEXT_FONT = cv2.FONT_HERSHEY_PLAIN
-TEXT_FONT_SCALE = 2
-TEXT_COLOR = (255, 0, 0)
-TEXT_FONT_THICKNESS = 2
+from mouse import VirtualMouse, Mouse
+from handgesture import HandGestureDetector
 
 # actions = ["nothing", "mouse_move", "click"]
 
 def main():
     hand_tracker = HandTracker(max_hands=1)
     mouse = Mouse()
+    gesture_detector = HandGestureDetector()
 
     cap = cv2.VideoCapture(0)
 
@@ -81,7 +78,7 @@ def main():
 
         img = cv2.flip(img, 1)
 
-        cv2.putText(img, text, TEXT_POSITION, TEXT_FONT, TEXT_FONT_SCALE, TEXT_COLOR, TEXT_FONT_THICKNESS)
+        utils.put_text(img, text)
 
         cv2.imshow("Virtual Mouse", img)
 

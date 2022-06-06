@@ -2,18 +2,12 @@ import cv2
 import mediapipe as mp
 import math
 
-FINGER_THUMB = [1, 2, 3, 4]
-FINGER_INDEX = [5, 6, 7, 8]
-FINGER_MIDDLE = [9, 10, 11, 12]
-FINGER_RING = [13, 14, 15, 16]
-FINGER_PINKY = [17, 18, 19, 20]
-
 FINGERS = [
-    FINGER_THUMB,
-    FINGER_INDEX,
-    FINGER_MIDDLE,
-    FINGER_RING,
-    FINGER_PINKY
+    [1, 2, 3, 4],
+    [5, 6, 7, 8],
+    [9, 10, 11, 12],
+    [13, 14, 15, 16],
+    [17, 18, 19, 20]
 ]
 
 class HandTracker:
