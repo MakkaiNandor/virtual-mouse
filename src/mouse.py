@@ -13,7 +13,7 @@ class VirtualMouse:
         threading.Thread(target=gui.click, daemon=True).start()
 
     def dragStart(self):
-        threading.Thread(target=gui.mouseDown(), daemon=True).start()
+        threading.Thread(target=gui.mouseDown, daemon=True).start()
 
     def dragStop(self):
-        threading.Thread(target=gui.mouseUp(), daemon=True).start()
+        threading.Thread(target=gui.mouseUp, daemon=True).start()

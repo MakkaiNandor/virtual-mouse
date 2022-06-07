@@ -1,5 +1,4 @@
 import cv2
-import time
 import utils
 from handtracker import HandTracker
 from mouse import VirtualMouse
