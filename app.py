@@ -9,7 +9,7 @@ class App():
     def __init__(self):
         self._window = WindowManager("Virtual Mouse", self.onKeyPress)
         self._capture = CameraCapture(0)
-        self._tracker = HandTracker(self.processHandLandmarks)
+        self._tracker = HandTracker(self.processHandLandmarks, 2)
 
     def onKeyPress(self, keycode):
         """Process key press events"""
