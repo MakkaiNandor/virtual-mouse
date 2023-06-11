@@ -1,15 +1,16 @@
 import cv2
+import time
 from camera.capture import CameraCapture
 from camera.window import WindowManager
 from hands.tracker import HandTracker
 from hands.utils import *
-import time
+from settings import settings
 
 class App():
     def __init__(self):
         self._window = WindowManager("Virtual Mouse", self.onKeyPress)
-        self._capture = CameraCapture(0)
-        self._tracker = HandTracker(self.processHandLandmarks, 2)
+        self._capture = CameraCapture(settings["camera"])
+        self._tracker = HandTracker(self.processHandLandmarks, settings["hands"])
 
     def onKeyPress(self, keycode):
         """Process key press events"""
