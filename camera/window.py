@@ -25,8 +25,7 @@ class WindowManager():
     def showFrame(self, fps=None):
         if self._frame_to_show is not None:
             if fps is not None:
-                cv2.putText(self._frame_to_show, fps, (7, 70), cv2.FONT_HERSHEY_SIMPLEX, 3, (100, 255, 0), 3, cv2.LINE_AA)
-                print(fps)
+                cv2.putText(self._frame_to_show, fps, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (100, 255, 0), 3, cv2.LINE_AA)
             cv2.imshow(self._window_name, self._frame_to_show)
             self._frame_to_show = None
 

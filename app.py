@@ -12,46 +12,45 @@ class App():
         self._tracker = HandTracker(self.processHandLandmarks)
 
     def onKeyPress(self, keycode):
+        """Process key press events"""
+
         print('onKeyPress', keycode)
-        if keycode == 27 or keycode == 113:
+
+        # Close the window if ESC or 'q' is pressed
+        if keycode == 27 or keycode == ord('q'):
             self._window.destroyWindow()
 
     def processHandLandmarks(self, landmarker_result, mp_image, timestamp_ms):
-        print(timestamp_ms)
+        """Process the image adter hand detection"""
         frame = drawLandmarksOnImage(mp_image.numpy_view(), landmarker_result)
         self._window.setFrame(frame)
 
     def run(self):
         """Run the main loop"""
-        start_timestamp = time.time()
         prev_timestamp = None
         self._window.createWindow()
         while self._window.isWindowOpened and self._capture.isCaptureOpened:
-            # self._capture.enterFrame()
             self._window.showFrame(self._capture.fps)
-            # print(self._capture.fps)
 
-            frame_ok = self._capture.readNextFrame()
+            # Read the next frame and process it if exists
+            if self._capture.readNextFrame():
+                frame = self._capture.frame
+                timestamp = self._capture.timestamp_ms
 
-            if frame_ok is None:
-                break
-            elif frame_ok == False:
-                continue
+                # Make sure the timestamp is monotonically increasing
+                if prev_timestamp is not None and  timestamp <= prev_timestamp:
+                    timestamp = prev_timestamp + 1
 
-            frame = self._capture.frame
+                # Mirror the captured image
+                frame = cv2.flip(frame, 1)
 
-            timestamp = int(time.time() - start_timestamp)
+                # Detect hands on the image
+                self._tracker.findHands(frame, timestamp)
 
-            if prev_timestamp is not None and  timestamp <= prev_timestamp:
-                timestamp = prev_timestamp + 1
+                prev_timestamp = timestamp
 
-            frame = cv2.flip(frame, 1)
-
-            self._tracker.findHands(frame, timestamp * 1000)
-
-            prev_timestamp = timestamp
-
-            self._window.processEvents()
+                # Process user inputs
+                self._window.processEvents()
 
 if __name__ == "__main__":
     App().run()

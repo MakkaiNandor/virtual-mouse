@@ -6,17 +6,18 @@ class CameraCapture():
         self._capture = cv2.VideoCapture(video_source)
         self._frame = None
         
-        self._frames_elapsed = 0
-        self._timestamp_ms = 0
-
         self._capture_size = (self._capture.get(cv2.CAP_PROP_FRAME_WIDTH), self._capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
+        
+        self._start_time = None
         self._prev_frame_time = None
         self._frame_time = None
 
     def readNextFrame(self):
         if not self.isCaptureOpened:
-            return None
+            return False
+
+        if self._start_time is None:
+            self._start_time = time.time()
 
         self._prev_frame_time = self._frame_time
         self._frame_time = time.time()
@@ -45,3 +46,7 @@ class CameraCapture():
     @property
     def captureSize(self):
         return self._capture_size
+
+    @property
+    def timestamp_ms(self):
+        return int((time.time() - self._start_time) * 1000)
