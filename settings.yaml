@@ -1,2 +1,4 @@
 camera: 0
 hands: 2
+face: True
+face_method: 'eigen'

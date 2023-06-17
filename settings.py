@@ -1,9 +1,14 @@
 import yaml
 
-default_settings = {"camera": 0, "hands": 1}
+default_settings = {
+    'camera': 0,
+    'hands': 1,
+    'face': True,
+    'face_method': 'eigen'
+}
 
 try:
-    with open("settings.yaml", "r") as f:
+    with open('settings.yaml', 'r') as f:
         settings = {**default_settings, **yaml.safe_load(f)}
 except yaml.YAMLError as exc:
     settings = default_settings

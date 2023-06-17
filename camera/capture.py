@@ -48,5 +48,5 @@ class CameraCapture():
         return self._capture_size
 
     @property
-    def timestamp_ms(self):
+    def timestampMs(self):
         return int((time.time() - self._start_time) * 1000)

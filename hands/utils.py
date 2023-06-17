@@ -38,7 +38,7 @@ def drawLandmarksOnImage(rgb_image, detection_result):
         text_y = int(min(y_coordinates) * height) - MARGIN
 
         # Draw handedness (left or right hand) on the image.
-        cv2.putText(annotated_image, f"{handedness[0].category_name}",
+        cv2.putText(annotated_image, f'{handedness[0].category_name}',
                     (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX,
                     FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
 
