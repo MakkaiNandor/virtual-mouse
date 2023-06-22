@@ -3,6 +3,7 @@ import time
 from camera.capture import CameraCapture
 from camera.window import WindowManager
 from hands.tracker import HandTracker
+from hands.gesture import HandGestureRecognizer
 from hands.utils import *
 from face.detector import FaceDetector
 from settings import settings
@@ -12,10 +13,11 @@ class App():
         self._window = WindowManager('Virtual Mouse', self.onKeyPress)
         self._capture = CameraCapture(settings['camera'])
         self._hand_tracker = HandTracker(self.processHandLandmarks, settings['hands'])
+        self._gesture_finder = HandGestureRecognizer()
         self._face_detector = FaceDetector(settings['face_method'])
 
     def onKeyPress(self, keycode):
-        '''Process key press events'''
+        """Process key press events"""
 
         print('onKeyPress', keycode)
 
@@ -24,12 +26,14 @@ class App():
             self._window.destroyWindow()
 
     def processHandLandmarks(self, landmarker_result, mp_image, timestamp_ms):
-        '''Process the image adter hand detection'''
-        frame = drawLandmarksOnImage(mp_image.numpy_view(), landmarker_result)
+        """Process the image adter hand detection"""
+        frame = self._hand_tracker.drawOnImage(mp_image.numpy_view(), landmarker_result)
+        hand_gesture = self._gesture_finder.recognize(landmarker_result)
+        print(hand_gesture)
         self._window.setFrame(frame)
 
     def run(self):
-        '''Run the main loop'''
+        """Run the main loop"""
         prev_timestamp = None
         self._window.createWindow()
         while self._window.isWindowOpened and self._capture.isCaptureOpened:
@@ -51,12 +55,7 @@ class App():
                 skip_hand_tracking = False
                 if settings['face']:
                     recognised, frame = self._face_detector.detect(frame)
-                    print(recognised, frame)
                     skip_hand_tracking = recognised == False
-                    # self._window.show(frame, self._capture.fps)
-                    # if recognised == False:
-                    #     self._window.show(frame, self._capture.fps)
-                    #     continue
 
                 # Detect hands on the image
                 if not skip_hand_tracking:
