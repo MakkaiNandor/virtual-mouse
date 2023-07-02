@@ -9,11 +9,12 @@ from face.utils import *
 
 class FaceDetectorTrainer():
     def __init__(self):
-        self._window = WindowManager('Train Face Detector', self.onKeyPressed)
+        self._capture = CameraCapture(int(settings['camera']))
+        self._window = WindowManager('Train Face Detector', self.onKeyPress)
         self._detector = cv2.CascadeClassifier(PATHS['cascade_file'])
 
-        createDirIfNotExists(PATHS['images'])
-        createDirIfNotExists(PATHS['models'])
+        createDirIfNotExists(PATHS['images_dir'])
+        createDirIfNotExists(PATHS['models_dir'])
 
         if settings['face_method'] in METHODS:
             self._method_data = METHODS[settings['face_method']]
@@ -24,12 +25,13 @@ class FaceDetectorTrainer():
             self._model = None
             self._model_file = None
 
-    def onKeyPressed(self, keycode):
+    def onKeyPress(self, keycode):
         if keycode == 27 or keycode == ord('q'):
+            self._capture.release()
             self._window.destroyWindow()
         
     def captureImages(self):
-        self._capture = CameraCapture(settings['camera'])
+        self._capture.start()
         self._window.createWindow()
         self._images_count = 0
         self._frame_count = 0
@@ -49,12 +51,13 @@ class FaceDetectorTrainer():
                 else:
                     break
 
-                # Process image
+                # Show image
                 self._window.show(frame)
 
                 # Process user inputs
                 self._window.processEvents()
 
+        self._capture.release()
         self._window.destroyWindow()
 
     def processImage(self, image):
@@ -82,10 +85,10 @@ class FaceDetectorTrainer():
                 # Save the face as image
                 self._images_count += 1
                 face_resized = cv2.resize(gray[y:y+h, x:x+w], FACE_SIZE)
-                cv2.imwrite('%s/%s.png' % (PATHS['images'], self._images_count), face_resized)
-                print('Captured image: ', self._images_count)
+                cv2.imwrite(os.path.join(PATHS['images_dir'], f'{self._images_count}.png'), face_resized)
 
-            cv2.rectangle(image, (x, y), (x+w, y+h), DEFAULT_COLOR, LINE_STROKE)
+            cv2.rectangle(image, (x, y), (x+w, y+h), COLOR_BLUE, LINE_STROKE)
+            putTextOnImage(image, f'{self._images_count * 100 / TRAIN_NR_FACES}%', (x, y-10), COLOR_BLUE)
 
         return image        
 
@@ -96,8 +99,8 @@ class FaceDetectorTrainer():
         if self._model is None:
             return False
 
-        for fn in os.listdir(PATHS['images']):
-            path = os.path.join(PATHS['images'], fn)
+        for fn in os.listdir(PATHS['images_dir']):
+            path = os.path.join(PATHS['images_dir'], fn)
             imgs.append(cv2.imread(path, 0))
             tags.append(0)
 
@@ -107,6 +110,13 @@ class FaceDetectorTrainer():
         (imgs, tags) = [np.array(item) for item in [imgs, tags]]
 
         self._model.train(imgs, tags)
-        self._model.save(os.path.join(PATHS['models'], self._model_file))
+        self._model.save(os.path.join(PATHS['models_dir'], self._model_file))
 
         return True
+
+if __name__ == '__main__':
+    deleteTrainingImages()
+    trainer = FaceDetectorTrainer()
+    trainer.captureImages()
+    trainer.train()
+    deleteTrainingImages()

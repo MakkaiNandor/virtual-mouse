@@ -12,7 +12,7 @@ class FaceDetector():
             self._model = self._method_data['function']()
             self._treshold = self._method_data['treshold']
             self._model_file = self._method_data['file']
-            path = os.path.join(PATHS['models'], self._model_file)
+            path = os.path.join(PATHS['models_dir'], self._model_file)
             if os.path.isfile(path):
                 self._model_exists = True
                 self._model.read(path)
@@ -46,10 +46,10 @@ class FaceDetector():
 
             if confidence[1] < self._treshold:
                 user_recognised = True
-                cv2.rectangle(image, (x, y), (x+w, y+h), SUCCESS_COLOR, LINE_STROKE)
-                cv2.putText(image, 'User - %.0f' % (confidence[1]), (x-10, y-10), FONT_FAMILY, FONT_SIZE, SUCCESS_COLOR, FONT_WEIGHT)
+                cv2.rectangle(image, (x, y), (x+w, y+h), COLOR_GREEN, LINE_STROKE)
+                putTextOnImage(image, 'User - %.0f' % (confidence[1]), (x-10, y-10), COLOR_GREEN)
             else:
-                cv2.rectangle(image, (x, y), (x+w, y+h), FAILURE_COLOR, LINE_STROKE)
-                cv2.putText(image, 'Unknown - %.0f' % (confidence[1]), (x-10, y-10), FONT_FAMILY, FONT_SIZE, FAILURE_COLOR, FONT_WEIGHT)
+                cv2.rectangle(image, (x, y), (x+w, y+h), COLOR_RED, LINE_STROKE)
+                putTextOnImage(image, 'Unknown - %.0f' % (confidence[1]), (x-10, y-10), COLOR_RED)
 
         return user_recognised, image

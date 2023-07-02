@@ -1,10 +1,12 @@
 import cv2
 import os
+from utils import *
+
+BASEPATH = 'face'
 
 PATHS = {
-    'basedir': 'face',
-    'images': os.path.join('face', 'images'),
-    'models': os.path.join('face', 'models'),
+    'images_dir': os.path.join(BASEPATH, 'images'),
+    'models_dir': os.path.join(BASEPATH, 'models'),
     'cascade_file': cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
 }
 
@@ -31,13 +33,6 @@ RESIZE_FACTOR = 4
 SCALE_FACTOR = 1.1
 MIN_NEIGHBORS = 5
 MIN_SIZE = (30, 30)
-LINE_STROKE = 3
-FONT_FAMILY = cv2.FONT_HERSHEY_PLAIN
-FONT_SIZE = 2
-FONT_WEIGHT = 2
-DEFAULT_COLOR = (255, 0, 0)
-SUCCESS_COLOR = (0, 255, 0)
-FAILURE_COLOR = (0, 0, 255)
 TRAIN_NR_FACES = 100
 TRAIN_IMG_FREQ = 5
 
@@ -58,13 +53,13 @@ def deleteDirContent(dir_path):
                 pass
 
 def deleteTrainingImages():
-    deleteDirContent(PATHS['images'])
+    deleteDirContent(PATHS['images_dir'])
 
 def deleteTrainedModels():
-    deleteDirContent(PATHS['models'])
+    deleteDirContent(PATHS['models_dir'])
 
 def deleteTrainedModelByMethod(method):
     if method in METHODS:
-        path = os.path.join(PATHS['models'], METHODS[method]['file'])
+        path = os.path.join(PATHS['models_dir'], METHODS[method]['file'])
         if os.path.isfile(path):
             os.unlink(path)
