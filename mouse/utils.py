@@ -1,0 +1,4 @@
+from utils import *
+
+MOUSE_MOVE_TRESHOLD = 8
+SCROLL_SENSITIVITY = 2
