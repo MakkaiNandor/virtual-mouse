@@ -1,4 +1,21 @@
-camera: 0
-hands: 2
-face: True
-face_method: 'eigen'
+camera: '0'
+face: false
+face_method: eigen
+hands: 1
+main_hand: Right
+mouse_sensitivity: 3
+navigation:
+  double_left_click:
+  - '11100'
+  drag_and_drop:
+  - '11111'
+  faster_move:
+  - '01100'
+  left_click:
+  - '11000'
+  move:
+  - '01000'
+  right_click:
+  - '01001'
+  scroll:
+  - '01110'

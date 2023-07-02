@@ -1,20 +1,23 @@
 import cv2
 import time
+import numpy as np
 from camera.capture import CameraCapture
 from camera.window import WindowManager
 from hands.tracker import HandTracker
 from hands.gesture import HandGestureRecognizer
-from hands.utils import *
 from face.detector import FaceDetector
-from settings import settings
+from mouse.control import MouseControl
+from settings import settings, getMainHand, getReferencePoints
+from utils import *
 
-class App():
+class VirtualMouse():
     def __init__(self):
+        self._capture = CameraCapture(int(settings['camera']))
         self._window = WindowManager('Virtual Mouse', self.onKeyPress)
-        self._capture = CameraCapture(settings['camera'])
         self._hand_tracker = HandTracker(self.processHandLandmarks, settings['hands'])
         self._gesture_finder = HandGestureRecognizer()
         self._face_detector = FaceDetector(settings['face_method'])
+        self._mouse = MouseControl(settings['hands'], settings['navigation'], getMainHand(), getReferencePoints(), settings['mouse_sensitivity'])
 
     def onKeyPress(self, keycode):
         """Process key press events"""
@@ -23,18 +26,32 @@ class App():
 
         # Close the window if ESC or 'q' is pressed
         if keycode == 27 or keycode == ord('q'):
+            self._capture.release()
             self._window.destroyWindow()
+
+    def landmarksToPixels(self, landmarker_result):
+        hand_landmarks = landmarker_result.hand_landmarks
+        for i in range(len(hand_landmarks)):
+            hand = hand_landmarks[i]
+            for j in range(len(hand)):
+                landmark = hand[j]
+                landmarker_result.hand_landmarks[i][j].x = int(landmark.x * self._capture.captureSize[0])
+                landmarker_result.hand_landmarks[i][j].y = int(landmark.y * self._capture.captureSize[1])
+        return landmarker_result
 
     def processHandLandmarks(self, landmarker_result, mp_image, timestamp_ms):
         """Process the image adter hand detection"""
         frame = self._hand_tracker.drawOnImage(mp_image.numpy_view(), landmarker_result)
+        landmarker_result = self.landmarksToPixels(landmarker_result)
         hand_gesture = self._gesture_finder.recognize(landmarker_result)
         print(hand_gesture)
+        method = self._mouse.execute(landmarker_result, hand_gesture)
         self._window.setFrame(frame)
 
     def run(self):
         """Run the main loop"""
         prev_timestamp = None
+        self._capture.start()
         self._window.createWindow()
         while self._window.isWindowOpened and self._capture.isCaptureOpened:
             self._window.showFrame(self._capture.fps)
@@ -68,5 +85,8 @@ class App():
                 # Process user inputs
                 self._window.processEvents()
 
+        self._capture.release()
+        self._window.destroyWindow()
+
 if __name__ == '__main__':
-    App().run()
+    VirtualMouse().run()
