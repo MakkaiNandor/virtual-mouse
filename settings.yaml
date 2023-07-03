@@ -3,7 +3,7 @@ face: false
 face_method: eigen
 hands: 1
 main_hand: Right
-mouse_sensitivity: 3
+mouse_sensitivity: 5.0
 navigation:
   double_left_click:
   - '11100'

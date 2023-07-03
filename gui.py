@@ -92,7 +92,6 @@ class MultiComboBox(ctk.CTkFrame):
             if value == 1:
                 names.append(finger)
             self._option_vars[finger].set(value)
-        print(values, names)
         names_str = ', '.join(names)
         self._text_var.set(names_str if len(names_str) else '-')
 
@@ -145,6 +144,13 @@ class GUI(ctk.CTk):
 
         # Create general settings tab
         tab_general = tabview.add('General')
+
+        # Mouse Sensitivity
+        mouse_sensitivity_wrap = Grid(tab_general)
+        mouse_sensitivity_wrap.add(ctk.CTkLabel(mouse_sensitivity_wrap, text='Mouse Sensitivity', font=FONT), weight=2, sticky='w')
+        mouse_sensitivity_wrap.add(ctk.CTkSlider(mouse_sensitivity_wrap, variable=self._mouse_sensitivity_var, from_=0.5, to=5, number_of_steps=45), weight=3)
+        mouse_sensitivity_wrap.add(ctk.CTkLabel(mouse_sensitivity_wrap, textvariable=self._mouse_sensitivity_str_var), weight=1)
+        mouse_sensitivity_wrap.pack(padx=10, pady=10, fill='x')
 
         # Camera source
         camera_src_wrap = Grid(tab_general)
@@ -276,6 +282,11 @@ class GUI(ctk.CTk):
         tabview.grid(row=0, column=1, padx=(5, 20), pady=(3, 20), sticky='nswe')
 
     def createVariables(self):
+        # Mouse sensitivity
+        self._mouse_sensitivity_var = ctk.DoubleVar(value=settings['mouse_sensitivity'])
+        self._mouse_sensitivity_str_var = ctk.StringVar(value=settings['mouse_sensitivity'])
+        self.handleChange('mouse_sensitivity', self._mouse_sensitivity_var)
+
         # Camera source
         self._camera_src_var = ctk.StringVar(value=settings['camera'])
         self.handleChange('camera', self._camera_src_var)
@@ -367,6 +378,9 @@ class GUI(ctk.CTk):
                     self.changeNavSetting(name, [nav_var[0].get()])
                 else:
                     self.changeNavSetting(name, [nav_var[0].get(), nav_var[1].get()])
+        elif key == 'mouse_sensitivity':
+            value = round(value, 1)
+            self._mouse_sensitivity_str_var.set(value)
             
         settings[key] = value
         saveSettings()
