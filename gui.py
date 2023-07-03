@@ -8,7 +8,7 @@ from PIL import Image, ImageTk
 from vmouse import VirtualMouse
 from face.train import FaceDetectorTrainer
 import face.utils as face_utils
-from settings import settings, default_settings, saveSettings, saveDefaultSettings
+from settings import settings, default_settings, saveSettings, getSettings
 
 ctk.set_appearance_mode('System')
 # ctk.set_appearance_mode('light')
@@ -448,14 +448,17 @@ class GUI(ctk.CTk):
         self.showFaceInfo(settings['face_method'])
 
     def recreateWindow(self):
-        saveDefaultSettings()
+        global settings
+        if messagebox.askyesno('Question', 'Are you sure to reset the settings to their default values?'):
+            saveSettings(default_settings)
+            settings = getSettings()
 
-        for widget in self.winfo_children():
-            widget.destroy()
+            for widget in self.winfo_children():
+                widget.destroy()
 
-        self.createVariables()
-        self.createElements()
-        self.showFaceInfo(settings['face_method'])
+            self.createVariables()
+            self.createElements()
+            self.showFaceInfo(settings['face_method'])
 
 if __name__ == "__main__":
     GUI().mainloop()

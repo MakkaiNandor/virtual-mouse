@@ -13,11 +13,11 @@ default_settings = {
         'faster_move': ['01100'],
         'left_click': ['11000'],
         'right_click': ['01001'],
-        'double_left_click': ['11001'],
-        'drag_and_drop': ['11111'],
+        'double_left_click': ['11100'],
+        'drag_and_drop': ['01111'],
         'scroll': ['01110']
     },
-    'mouse_sensitivity': 1.5
+    'mouse_sensitivity': 3.5
 }
 
 try:
@@ -27,6 +27,19 @@ except yaml.YAMLError as exc:
     settings = default_settings
 
 # print(json.dumps(settings, indent=4))
+
+def getSettings():
+    try:
+        with open('settings.yaml', 'r') as f:
+            return yaml.safe_load(f)
+    except yaml.YAMLError as exc:
+        return {}
+
+def saveSettings(data=None):
+    if data is None:
+        data = settings
+    with open('settings.yaml', 'w') as f:
+        yaml.dump(data, f)
 
 def getMainHand():
     main_hand = 0
@@ -50,11 +63,3 @@ def getReferencePoints():
         ref_points[method_name] = FINGERS[first_finger_up][-1]
 
     return ref_points
-
-def saveSettings():
-    with open('settings.yaml', 'w') as f:
-        yaml.dump(settings, f)
-
-def saveDefaultSettings():
-    with open('settings.yaml', 'w') as f:
-        yaml.dump(default_settings, f)

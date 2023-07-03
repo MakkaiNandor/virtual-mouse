@@ -49,6 +49,7 @@ class MouseControl():
             self._prev_pos = None
             self._curr_pos = None
         else:
+            print('Action:', active_method)
             getattr(self, active_method)()
 
         self._prev_method = active_method

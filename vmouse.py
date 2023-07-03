@@ -22,7 +22,7 @@ class VirtualMouse():
     def onKeyPress(self, keycode):
         """Process key press events"""
 
-        print('onKeyPress', keycode)
+        print('Key Pressed:', keycode)
 
         # Close the window if ESC or 'q' is pressed
         if keycode == 27 or keycode == ord('q'):
