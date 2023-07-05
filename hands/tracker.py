@@ -23,6 +23,16 @@ class HandTracker:
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=image)
         self._detector.detect_async(mp_image, timestamp_ms)
 
+    def landmarksToPixels(self, landmarker_result, size):
+        hand_landmarks = landmarker_result.hand_landmarks
+        for i in range(len(hand_landmarks)):
+            hand = hand_landmarks[i]
+            for j in range(len(hand)):
+                landmark = hand[j]
+                landmarker_result.hand_landmarks[i][j].x = int(landmark.x * size[0])
+                landmarker_result.hand_landmarks[i][j].y = int(landmark.y * size[1])
+        return landmarker_result
+
     def drawOnImage(self, rgb_image, hands_result):
         hand_landmarks_list = hands_result.hand_landmarks
         handedness_list = hands_result.handedness

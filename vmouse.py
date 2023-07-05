@@ -17,7 +17,7 @@ class VirtualMouse():
         self._hand_tracker = HandTracker(self.processHandLandmarks, settings['hands'])
         self._gesture_finder = HandGestureRecognizer()
         self._face_detector = FaceDetector(settings['face_method'])
-        self._mouse = MouseControl(settings['hands'], settings['navigation'], getMainHand(), getReferencePoints(), settings['mouse_sensitivity'])
+        self._mouse = MouseControl()
 
     def onKeyPress(self, keycode):
         """Process key press events"""
@@ -29,23 +29,15 @@ class VirtualMouse():
             self._capture.release()
             self._window.destroyWindow()
 
-    def landmarksToPixels(self, landmarker_result):
-        hand_landmarks = landmarker_result.hand_landmarks
-        for i in range(len(hand_landmarks)):
-            hand = hand_landmarks[i]
-            for j in range(len(hand)):
-                landmark = hand[j]
-                landmarker_result.hand_landmarks[i][j].x = int(landmark.x * self._capture.captureSize[0])
-                landmarker_result.hand_landmarks[i][j].y = int(landmark.y * self._capture.captureSize[1])
-        return landmarker_result
-
     def processHandLandmarks(self, landmarker_result, mp_image, timestamp_ms):
         """Process the image adter hand detection"""
         frame = self._hand_tracker.drawOnImage(mp_image.numpy_view(), landmarker_result)
-        landmarker_result = self.landmarksToPixels(landmarker_result)
+        landmarker_result = self._hand_tracker.landmarksToPixels(landmarker_result, self._capture.captureSize)
         hand_gesture = self._gesture_finder.recognize(landmarker_result)
-        print(hand_gesture)
+        # print(hand_gesture)
         method = self._mouse.execute(landmarker_result, hand_gesture)
+        if not method == False and method is not None:
+            putTextOnImage(frame, f"{method}", (10, 55), COLOR_BLUE)
         self._window.setFrame(frame)
 
     def run(self):

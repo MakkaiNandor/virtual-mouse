@@ -1,14 +1,12 @@
 import pyautogui
 import threading
+from settings import settings, getMainHand, getReferencePoints
 from mouse.utils import *
 
 class MouseControl():
-    def __init__(self, hands, navigation, main_hand, ref_points, mouse_sensitivity):
-        self._hands = hands
-        self._navigation = navigation
-        self._main_hand = main_hand
-        self._ref_points = ref_points
-        self._mouse_sensitivity = mouse_sensitivity
+    def __init__(self):
+        self._main_hand = getMainHand()
+        self._ref_points = getReferencePoints()
         self._landmarks = None
         self._prev_pos = None
         self._curr_pos = None
@@ -21,11 +19,11 @@ class MouseControl():
     def execute(self, landmarker_result, gestures):
         self._landmarks = landmarker_result.hand_landmarks
 
-        if not len(gestures) == self._hands:
+        if not len(gestures) == settings['hands']:
             # not enough hands are detected
-            return False, None
+            return False
 
-        if self._hands == 2:
+        if settings['hands'] == 2:
             # order the detected gestures -> [Left, Right]
             if not list(gestures.keys()).index('Left') == 0:
                 self._landmarks = [self._landmarks[1], self._landmarks[0]]
@@ -34,7 +32,7 @@ class MouseControl():
             gestures = list(gestures.values())
 
         active_method = None
-        for method_name, method_gestures in self._navigation.items():
+        for method_name, method_gestures in settings['navigation'].items():
             if len(method_gestures) == len(gestures):
                 status = []
                 for i in range(len(gestures)):
@@ -49,7 +47,7 @@ class MouseControl():
             self._prev_pos = None
             self._curr_pos = None
         else:
-            print('Action:', active_method)
+            # print('Action:', active_method)
             getattr(self, active_method)()
 
         self._prev_method = active_method
@@ -61,11 +59,11 @@ class MouseControl():
         if self._prev_pos is not None:
             diff_x = self._curr_pos.x - self._prev_pos.x
             if abs(diff_x) > MOUSE_MOVE_TRESHOLD:
-                diff_x *= self._mouse_sensitivity
+                diff_x *= settings['mouse_sensitivity']
 
             diff_y = self._curr_pos.y - self._prev_pos.y
             if abs(diff_y) > MOUSE_MOVE_TRESHOLD:
-                diff_y *= self._mouse_sensitivity
+                diff_y *= settings['mouse_sensitivity']
 
             self.runAsync(pyautogui.move, (diff_x, diff_y))
 
@@ -77,11 +75,11 @@ class MouseControl():
         if self._prev_pos is not None:
             diff_x = self._curr_pos.x - self._prev_pos.x
             if abs(diff_x) > MOUSE_MOVE_TRESHOLD:
-                diff_x *= self._mouse_sensitivity * 2
+                diff_x *= settings['mouse_sensitivity'] * 2
 
             diff_y = self._curr_pos.y - self._prev_pos.y
             if abs(diff_y) > MOUSE_MOVE_TRESHOLD:
-                diff_y *= self._mouse_sensitivity * 2
+                diff_y *= settings['mouse_sensitivity'] * 2
 
             self.runAsync(pyautogui.move, (diff_x, diff_y))
 
