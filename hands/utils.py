@@ -14,7 +14,7 @@ class Triangle():
         self._p3 = p3
 
     def area(self):
-        return abs((self._p2.x - self._p1.x) * (self._p3.y - self._p1.y) - (self._p2.y - self._p1.y) * (self._p3.x - self._p1.x)) / 2
+        return abs(self._p1.x * (self._p2.y - self._p3.y) + self._p2.x * (self._p3.y - self._p1.y) + self._p3.x * (self._p1.y - self._p2.y)) / 2
 
     def contains(self, p):
         area_sum = Triangle(self._p1, self._p2, p).area()
