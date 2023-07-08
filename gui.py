@@ -408,8 +408,16 @@ class GUI(ctk.CTk):
         if not self.checkCamera(int(settings['camera'])):
             messagebox.showerror('Error', 'This video source is unavailable')
             return
-            
-        subprocess.Popen(['python', 'vmouse.py'])
+        
+        python_win = os.path.join('..', 'Scripts', 'python.exe')
+        python_unix = os.path.join('..', 'bin', 'python.exe')
+
+        if os.path.exists(python_win):
+            subprocess.Popen([python_win, 'vmouse.py'])
+        elif os.path.exists(python_unix):
+            subprocess.Popen([python_unix, 'vmouse.py'])
+        else:
+            subprocess.Popen(['python', 'vmouse.py'])
 
     def showFaceInfo(self, value):
         if self.faceIsRegistered(value):
