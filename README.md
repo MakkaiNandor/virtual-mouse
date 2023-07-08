@@ -41,10 +41,8 @@ Clone the repository with this command `git clone https://github.com/MakkaiNando
 
 The `requirements.txt` contains the Python packages which are required for the application to run. You can install all of these packages whit this command:
 
-  - Windows: `pip install -r requirements.txt`
-  - MacOS: `pip3 install -r requirements.txt`
+`pip install -r requirements.txt`
 
-Now you can run the application:
+Run the application: `python vmouse.py`
 
-  - Windows: `python app.py`
-  - MacOS: `python3 app.py`
+Run with the GUI: `python gui.py`
